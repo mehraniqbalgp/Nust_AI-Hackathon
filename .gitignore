@@ -1,0 +1,13 @@
+node_modules/
+.env
+*.db
+*.db-wal
+*.db-shm
+.DS_Store
+/tmp/
+*.log
+nohup.out
+cloudflared.deb
+artifacts/
+cache/
+.cloudflared/

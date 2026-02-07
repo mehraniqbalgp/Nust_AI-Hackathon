@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: campusverify_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-campusverify}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret123}
+      POSTGRES_DB: ${DB_NAME:-campusverify}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-campusverify}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: campusverify_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # IPFS Node (optional - for local development)
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: campusverify_ipfs
+    restart: unless-stopped
+    volumes:
+      - ipfs_data:/data/ipfs
+    ports:
+      - "4001:4001"      # P2P
+      - "5001:5001"      # API
+      - "8080:8080"      # Gateway
+    environment:
+      IPFS_PROFILE: server
+    profiles:
+      - full
+
+  # Application Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campusverify_app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${DB_USER:-campusverify}:${DB_PASSWORD:-secret123}@postgres:5432/${DB_NAME:-campusverify}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      IPFS_API_URL: ${IPFS_API_URL:-http://ipfs:5001}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+    profiles:
+      - full
+
+volumes:
+  postgres_data:
+  redis_data:
+  ipfs_data:
+
+networks:
+  default:
+    name: campusverify_network

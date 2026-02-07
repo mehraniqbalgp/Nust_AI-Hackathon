@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Anonymous Campus Rumor Verification System - Decentralized truth-seeking with game-theoretic incentives">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <title>CampusVerify - Anonymous Rumor Verification</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <a href="#" class="brand" aria-label="CampusVerify Home">
+            <span class="brand-icon">🔍</span>
+            <span>CampusVerify</span>
+        </a>
+
+        <div class="nav-links">
+            <a href="#" class="nav-link active" data-page="feed" role="button" aria-current="page">
+                <span>📰</span> <span>Feed</span>
+            </a>
+            <a href="#" class="nav-link" data-page="submit" role="button">
+                <span>📤</span> <span>Submit</span>
+            </a>
+            <a href="#" class="nav-link" data-page="dashboard" role="button">
+                <span>📊</span> <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-link" data-page="leaderboard" role="button">
+                <span>🏆</span> <span>Leaderboard</span>
+            </a>
+        </div>
+
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+                🌙
+            </button>
+            <div class="token-display" aria-label="Your token balance">
+                <span class="token-icon">💎</span>
+                <span id="tokenBalance">100</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main" role="main">
+        <div class="container">
+
+            <!-- Feed Page -->
+            <section class="page active" id="feedPage" aria-labelledby="feedTitle">
+                <div class="page-header">
+                    <h1 id="feedTitle">Campus Feed</h1>
+                    <div class="filter-tabs" role="tablist" aria-label="Filter rumors">
+                        <button class="filter-tab active" data-filter="trending" role="tab" aria-selected="true">🔥
+                            Trending</button>
+                        <button class="filter-tab" data-filter="recent" role="tab" aria-selected="false">🕐
+                            Recent</button>
+                        <button class="filter-tab" data-filter="verified" role="tab" aria-selected="false">✅
+                            Verified</button>
+                        <button class="filter-tab" data-filter="disputed" role="tab" aria-selected="false">⚠️
+                            Disputed</button>
+                    </div>
+                </div>
+                <div class="feed-grid" id="rumorsFeed" role="feed" aria-label="Rumors feed">
+                    <!-- Rumors loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Submit Page -->
+            <section class="page" id="submitPage" aria-labelledby="submitTitle">
+                <!-- Submit form loaded dynamically -->
+            </section>
+
+            <!-- Dashboard Page -->
+            <section class="page" id="dashboardPage" aria-labelledby="dashboardTitle">
+                <!-- Dashboard loaded dynamically -->
+            </section>
+
+            <!-- Leaderboard Page -->
+            <section class="page" id="leaderboardPage" aria-labelledby="leaderboardTitle">
+                <!-- Leaderboard loaded dynamically -->
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Trust Score Modal -->
+    <div class="modal" id="trustModal" role="dialog" aria-labelledby="trustModalTitle" aria-modal="true">
+        <div class="modal-backdrop" onclick="RumorCard.closeTrustModal()"></div>
+        <div class="modal-content" id="trustModalBody">
+            <!-- Trust breakdown loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Verify Modal -->
+    <div class="modal" id="verifyModal" role="dialog" aria-labelledby="verifyModalTitle" aria-modal="true">
+        <div class="modal-backdrop" onclick="VerifyRumor.close()"></div>
+        <div class="modal-content">
+            <!-- Verify form loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- PoW Challenge Modal -->
+    <div class="modal" id="powModal" role="dialog" aria-labelledby="powModalTitle" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="pow-challenge">
+                <h2 id="powModalTitle">🔐 Identity Verification</h2>
+                <p>Completing a proof-of-work challenge to verify you're human.</p>
+                <div class="pow-progress">
+                    <div class="pow-progress-bar">
+                        <div class="pow-progress-fill" id="powProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="pow-status" id="powStatus">Initializing...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer" role="alert" aria-live="polite">
+        <!-- Toasts added dynamically -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/models.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/trustEngine.js"></script>
+    <script src="js/tokenEconomy.js"></script>
+    <script src="js/anomalyDetector.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/components/RumorCard.js"></script>
+    <script src="js/components/Feed.js"></script>
+    <script src="js/components/SubmitRumor.js"></script>
+    <script src="js/components/VerifyRumor.js"></script>
+    <script src="js/components/Dashboard.js"></script>
+    <script src="js/components/Leaderboard.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeToggle.textContent = next === 'dark' ? '🌙' : '☀️';
+        });
+
+        // Initialize app when DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof App !== 'undefined') {
+                App.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

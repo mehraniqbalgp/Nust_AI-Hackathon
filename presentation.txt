@@ -1,0 +1,340 @@
+# CampusVerify - Presentation Outline
+# Anonymous Campus Rumor Verification System
+
+================================================================================
+                              PRESENTATION SLIDES
+================================================================================
+
+## SLIDE 1: TITLE SLIDE
+─────────────────────────────────────────────────────────────────────────────────
+Title: CampusVerify
+Subtitle: Anonymous Campus Rumor Verification System
+Tagline: "Truth Through Verification, Not Popularity"
+
+Visual: App logo/screenshot of the main feed
+Team: [Your team name/members]
+Event: NUST Hackathon 2026
+
+================================================================================
+
+## SLIDE 2: THE PROBLEM
+─────────────────────────────────────────────────────────────────────────────────
+Title: The Misinformation Crisis on Campus
+
+Key Points:
+• Rumors spread faster than facts on campus
+• No way to verify anonymous claims
+• False information causes real harm (reputation, panic, decisions)
+• Social media echo chambers amplify unverified claims
+
+Visual: Statistics or examples of campus misinformation impact
+Quote: "A lie can travel halfway around the world while the truth is putting on its shoes"
+
+================================================================================
+
+## SLIDE 3: OUR SOLUTION
+─────────────────────────────────────────────────────────────────────────────────
+Title: CampusVerify - Decentralized Truth Discovery
+
+Core Concept:
+• Anonymous rumor submission with evidence
+• Community verification (stake tokens to vote)
+• Trust scores based on verification accuracy
+• Bot detection prevents manipulation
+
+Visual: App screenshot showing rumor with trust score
+
+Tagline: "Truth emerges from competitive verification, not popularity contests"
+
+================================================================================
+
+## SLIDE 4: HOW IT WORKS - USER FLOW
+─────────────────────────────────────────────────────────────────────────────────
+Title: Simple 4-Step Process
+
+Step 1: SUBMIT - Post a rumor (10+ characters) with optional evidence
+Step 2: STAKE - Bet tokens (5-50💎) on your information's accuracy  
+Step 3: VERIFY - Community votes with their own stake
+Step 4: RESOLVE - Truth emerges, winners earn tokens
+
+Visual: Flow diagram or app screenshots of each step
+
+================================================================================
+
+## SLIDE 5: TRUST SCORE SYSTEM
+─────────────────────────────────────────────────────────────────────────────────
+Title: Dynamic Trust Scoring
+
+Trust Levels:
+• 🟢 75-100%: VERIFIED - High confidence, mostly confirmed
+• 🟡 40-74%: UNCERTAIN - Needs more verification  
+• 🔴 0-39%: DISPUTED - Likely false or unverifiable
+
+Factors:
+• Number of verifications
+• Quality of evidence provided
+• Stake amounts wagered
+• Voter reputation scores
+
+Visual: Trust meter animation from the app
+
+================================================================================
+
+## SLIDE 6: TOKEN ECONOMY (GAMIFICATION)
+─────────────────────────────────────────────────────────────────────────────────
+Title: Stake-Based Incentive System
+
+Token Mechanics:
+• New users start with 50💎 tokens
+• Stake 10💎 to submit a rumor
+• Stake 5-50💎 to verify/dispute
+• Win tokens when you're right
+• Lose tokens when you're wrong
+
+Why It Works:
+• Skin in the game = quality contributions
+• Bad actors lose tokens quickly
+• Truth-tellers gain reputation
+
+Visual: Token balance display, stake slider
+
+================================================================================
+
+## SLIDE 7: 🤖 BOT DETECTION SYSTEM
+─────────────────────────────────────────────────────────────────────────────────
+Title: AI-Powered Anomaly Detection
+
+Detection Triggers:
+┌─────────────────────────────────────────────────┐
+│ • Regular timing patterns (+0.3 score)          │
+│ • 24/7 activity - no human sleep (+0.2 score)   │
+│ • Single action type only (+0.2 score)          │
+│ • Temporal vote clustering (+0.3 score)         │
+│ • One-sided voting patterns (+0.15 score)       │
+└─────────────────────────────────────────────────┘
+
+Automated Response:
+• Score 0.7+: 🚫 BLOCKED - Vote rejected
+• Score 0.5-0.7: ⚠️ REDUCED - 50% vote weight
+• Score 0.3-0.5: 👁️ MONITORED - Enhanced logging
+
+Visual: Console showing bot detection in action
+
+================================================================================
+
+## SLIDE 8: PENALTY ENFORCEMENT (LIVE DEMO POINT)
+─────────────────────────────────────────────────────────────────────────────────
+Title: Real-Time Bot Blocking
+
+Demo Script:
+1. Show normal user voting successfully
+2. Inject bot behavior via console
+3. Attempt to vote → BLOCKED!
+4. Show "Suspicious activity detected" message
+
+Code snippet for demo:
+```javascript
+// Simulate bot behavior
+user.actionTimestamps = [];
+for (let h = 0; h < 24; h++) {
+  user.actionTimestamps.push({ 
+    time: Date.now() - h*3600000, 
+    type: 'verify' 
+  });
+}
+// Now try to vote - BLOCKED!
+```
+
+Visual: Screenshot of blocked vote message
+
+================================================================================
+
+## SLIDE 9: EVIDENCE SYSTEM
+─────────────────────────────────────────────────────────────────────────────────
+Title: Multi-Type Evidence Support
+
+Evidence Types:
+• 📷 Photos - Image uploads with preview
+• 🎥 Videos - Up to 10MB video evidence
+• 📝 Testimony - Written firsthand accounts
+• 📄 Documents - PDF/document uploads
+
+Features:
+• In-app viewing and download
+• Evidence displayed on rumor cards
+• Increases trust score weight
+
+Visual: Screenshot of evidence upload modal
+
+================================================================================
+
+## SLIDE 10: CATEGORIES & FILTERING
+─────────────────────────────────────────────────────────────────────────────────
+Title: Organized Information
+
+Categories:
+• 🎓 Academic - Exam dates, professor changes
+• 🏢 Facilities - Building issues, amenities
+• 👥 Social - Events, campus life
+• 🔒 Safety - Security concerns, alerts
+• 💼 Admin - Policy changes, announcements
+
+Filters:
+• Trending (most active)
+• Recent (newest first)
+• Verified (highest trust)
+
+Visual: Category grid and filter tabs
+
+================================================================================
+
+## SLIDE 11: TECHNICAL ARCHITECTURE
+─────────────────────────────────────────────────────────────────────────────────
+Title: Tech Stack
+
+Frontend:
+• Vanilla JavaScript (no frameworks)
+• Modular component architecture
+• CSS with dark/light mode
+• Responsive mobile design
+
+Backend:
+• Node.js + Express
+• SQLite database
+• WebSocket real-time updates
+• RESTful API
+
+Security:
+• Anomaly detection engine
+• Trust-based vote weighting
+• Token-based rate limiting
+
+Visual: Architecture diagram
+
+================================================================================
+
+## SLIDE 12: DATABASE SCHEMA
+─────────────────────────────────────────────────────────────────────────────────
+Title: Data Model
+
+Core Tables:
+┌─────────────────┐    ┌─────────────────┐
+│     USERS       │    │     RUMORS      │
+├─────────────────┤    ├─────────────────┤
+│ id              │───→│ userId          │
+│ tokenBalance    │    │ content         │
+│ reputation      │    │ category        │
+│ trustScore      │    │ supportCount    │
+│ actionTimestamps│    │ disputeCount    │
+│ botScore        │    │ trustScore      │
+└─────────────────┘    │ evidenceFiles   │
+                       └─────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │  VERIFICATIONS  │
+                    ├─────────────────┤
+                    │ rumorId         │
+                    │ userId          │
+                    │ voteType        │
+                    │ stakeAmount     │
+                    │ evidence        │
+                    └─────────────────┘
+
+================================================================================
+
+## SLIDE 13: KEY DIFFERENTIATORS
+─────────────────────────────────────────────────────────────────────────────────
+Title: Why CampusVerify Stands Out
+
+vs. Social Media:
+✗ Popularity-based (most likes wins)
+✓ Evidence-based (stake + verify)
+
+vs. Anonymous Apps (YikYak, Whisper):
+✗ No accountability
+✓ Token stake = accountability
+
+vs. Fact-Checking Sites:
+✗ Slow, centralized authority
+✓ Real-time, decentralized community
+
+Unique Features:
+• First campus-focused verification platform
+• Game theory incentives for truth
+• AI bot detection integrated
+
+================================================================================
+
+## SLIDE 14: FUTURE ROADMAP
+─────────────────────────────────────────────────────────────────────────────────
+Title: What's Next
+
+Phase 2:
+• University SSO integration
+• Cross-campus federation
+• Mobile apps (iOS/Android)
+
+Phase 3:
+• ML-powered evidence verification
+• Reputation NFTs
+• Admin dashboard for moderators
+
+Phase 4:
+• Multi-language support
+• Public API for integrations
+• University partnership program
+
+================================================================================
+
+## SLIDE 15: LIVE DEMO
+─────────────────────────────────────────────────────────────────────────────────
+Title: Let's See It In Action!
+
+Demo Flow:
+1. Show the feed with existing rumors
+2. Submit a new rumor with evidence
+3. Verify another rumor (show token deduction)
+4. Show trust score updating
+5. (Optional) Demo bot detection blocking
+
+URL: http://localhost:3000
+
+================================================================================
+
+## SLIDE 16: THANK YOU / Q&A
+─────────────────────────────────────────────────────────────────────────────────
+Title: Questions?
+
+Contact:
+• GitHub: [your-repo]
+• Email: [team-email]
+
+Call to Action:
+"Help us build a more truthful campus community"
+
+Visual: QR code to the app or repo
+
+================================================================================
+
+## APPENDIX: TALKING POINTS
+─────────────────────────────────────────────────────────────────────────────────
+
+Key Stats to Mention:
+• 6 rumor categories
+• 4-severity bot detection system
+• Real-time WebSocket updates
+• Token economy with 50💎 starting balance
+
+Anticipated Questions:
+Q: How do you prevent coordinated attacks?
+A: Bot detection catches temporal clustering, velocity spikes, and one-sided voting
+
+Q: What if someone loses all tokens?
+A: Daily token refresh, earn tokens for correct verifications
+
+Q: How is this different from Reddit/Twitter polls?
+A: Stake requirement + reputation system prevents spam and manipulation
+
+Q: Is it truly anonymous?
+A: Yes, only cryptographic fingerprints stored, no personal data

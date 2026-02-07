@@ -1,0 +1,837 @@
+================================================================================
+        CAMPUSVERIFY - COMPLETE PROJECT EXPLANATION
+        Anonymous Campus Rumor Verification System
+================================================================================
+
+📋 TABLE OF CONTENTS
+────────────────────
+1.  What Is CampusVerify?
+2.  The Problem It Solves
+3.  How the System Works (User Perspective)
+4.  System Architecture
+5.  Frontend - File by File Breakdown
+6.  Backend - File by File Breakdown
+7.  Core Algorithms Explained
+    7a. Trust Score Engine (5-Component Formula)
+    7b. Token Economy (Game Theory)
+    7c. Bot/Anomaly Detection
+8.  Data Models
+9.  Smart Contracts (Blockchain Layer)
+10. Security Features
+11. How Everything Connects Together
+12. Complete User Journey (Step by Step)
+
+================================================================================
+
+1. WHAT IS CAMPUSVERIFY?
+================================================================================
+
+CampusVerify is a decentralized, anonymous campus rumor verification system. 
+Think of it as a "truth marketplace" where students can:
+
+  - Anonymously post rumors or claims about campus life
+  - Stake tokens (virtual currency) on their claims being true
+  - Vote to verify or dispute other people's rumors
+  - Earn rewards for identifying truth, lose tokens for spreading lies
+  - View trust scores that show how likely a rumor is to be true
+
+The key innovation: NOBODY is in charge. There's no admin deciding what's true.
+Instead, truth emerges from game theory - people are financially incentivized
+to be honest because lying costs them tokens.
+
+
+================================================================================
+
+2. THE PROBLEM IT SOLVES
+================================================================================
+
+On every campus, rumors spread constantly:
+  - "The exam is postponed to next week"
+  - "The cafeteria failed a health inspection"
+  - "Professor X is leaving the university"
+  - "There was a security incident at the hostel"
+
+CURRENT PROBLEMS:
+  ❌ No way to verify anonymous claims
+  ❌ False information causes panic, bad decisions
+  ❌ Social media rewards engagement, not truth
+  ❌ Popular posts aren't necessarily accurate
+  ❌ Coordinated groups can manipulate opinions
+  ❌ No accountability in anonymous systems
+
+CAMPUSVERIFY SOLUTION:
+  ✅ Stake-based system = skin in the game
+  ✅ Multi-factor trust scoring = evidence-based truth
+  ✅ Bot detection = can't be gamed by automation
+  ✅ Token economy = truth-tellers get richer, liars go broke
+  ✅ Anonymous but accountable through cryptographic identity
+
+
+================================================================================
+
+3. HOW THE SYSTEM WORKS (USER PERSPECTIVE)
+================================================================================
+
+STEP 1: USER GETS AN ACCOUNT
+  - Opens the app at http://localhost:3000
+  - System auto-creates an anonymous identity
+  - Gets a random name like "Anonymous_Eagle" or "Secret_Wolf"
+  - Starts with 100💎 tokens
+  - No email, no phone, no personal data needed
+
+STEP 2: BROWSING THE FEED
+  - Main feed shows all campus rumors
+  - Each rumor has a TRUST SCORE (0-100%)
+  - Color-coded: 🟢 Green = Verified, 🟡 Yellow = Uncertain, 🔴 Red = Disputed
+  - Can filter by category: Academic, Facilities, Events, Food, Tech, Other
+  - Can sort by: Trending, Recent, Most Verified
+
+STEP 3: SUBMITTING A RUMOR
+  - Click "Submit" tab
+  - Step 1: Write your claim (minimum 10 characters)
+  - Step 2: Choose a category
+  - Step 3: Optionally attach evidence (photo, video, document)
+  - Step 4: Set your stake (10-50💎 tokens)
+  - Higher stake = more confidence = higher initial trust score
+  - 10💎 tokens are deducted from your balance
+
+STEP 4: VERIFYING / DISPUTING A RUMOR
+  - Click ✅ Verify or ❌ Dispute on any rumor
+  - Write optional evidence supporting your position
+  - Set your stake (2-20💎 tokens)
+  - Your vote weight depends on your REPUTATION
+  - Higher reputation = your vote counts more
+
+STEP 5: EARNING REWARDS
+  - When a rumor gets enough votes + time passes, it RESOLVES
+  - If you voted correctly → get your stake back + 50% bonus + share of loser pool
+  - If you voted incorrectly → lose your staked tokens
+  - If inconclusive → get 50% refund
+
+STEP 6: BUILDING REPUTATION
+  - Accurate verifications increase your reputation (0.0 to 1.0)
+  - False verifications decrease it
+  - Higher reputation = higher vote weight = more influence
+  - Unlock achievements for milestones
+
+
+================================================================================
+
+4. SYSTEM ARCHITECTURE
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        BROWSER (Frontend)                       │
+│                                                                 │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐          │
+│  │   Feed   │ │ Submit   │ │  Verify  │ │Dashboard │          │
+│  │          │ │  Rumor   │ │  Rumor   │ │          │          │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘          │
+│       │             │            │             │                │
+│  ┌────┴─────────────┴────────────┴─────────────┴──────┐        │
+│  │              Core JavaScript Modules                │        │
+│  │  ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐ │        │
+│  │  │  Store  │ │  Trust   │ │  Token   │ │Anomaly │ │        │
+│  │  │  (.js)  │ │  Engine  │ │ Economy  │ │Detector│ │        │
+│  │  └─────────┘ └──────────┘ └──────────┘ └────────┘ │        │
+│  └────────────────────┬───────────────────────────────┘        │
+│                       │ fetch() + WebSocket                     │
+└───────────────────────┼─────────────────────────────────────────┘
+                        │
+                        ▼
+┌───────────────────────────────────────────────────────────────────┐
+│                       SERVER (Backend)                             │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │                    Express.js Server                      │    │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐  │    │
+│  │  │  Routes  │ │Middleware│ │ Services │ │  WebSocket │  │    │
+│  │  │ /rumors  │ │ botDetec │ │ database │ │ real-time  │  │    │
+│  │  │ /verify  │ │ rateLimit│ │ fingerpr │ │ broadcast  │  │    │
+│  │  │ /users   │ │ auth     │ │ blockchain│ │            │  │    │
+│  │  │ /auth    │ │ errorHndl│ │ zkproof  │ │            │  │    │
+│  │  └──────────┘ └──────────┘ └──────────┘ └────────────┘  │    │
+│  └──────────────────────┬───────────────────────────────────┘    │
+│                         │                                         │
+│                         ▼                                         │
+│  ┌──────────────────────────────────────┐                        │
+│  │           SQLite Database            │                        │
+│  │  campusverify.db (24MB)              │                        │
+│  │  Users | Rumors | Verifications      │                        │
+│  └──────────────────────────────────────┘                        │
+│                                                                   │
+│  ┌──────────────────────────────────────┐                        │
+│  │     Solidity Smart Contracts         │                        │
+│  │  TruthToken.sol | RumorLedger.sol    │                        │
+│  └──────────────────────────────────────┘                        │
+└───────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+
+5. FRONTEND - FILE BY FILE BREAKDOWN
+================================================================================
+
+📁 Root Files:
+──────────────
+  index.html           → Main HTML page (skeleton of the app)
+                         Loads all CSS and JS files
+                         Contains navigation tabs (Feed, Submit, Dashboard)
+                         Single-page application structure
+
+  index.css            → Complete stylesheet (50KB!)
+                         Dark theme with CSS variables
+                         Responsive design (mobile-first)
+                         Complex animations, gradients, glassmorphism
+                         Trust score colors, modal styles
+
+📁 js/ - Core JavaScript Modules:
+───────────────────────────────────
+  js/app.js            → Application Controller
+                         Navigation between pages (Feed, Submit, Dashboard)
+                         Toast notification system (success/error/warning)
+                         Page routing and state management
+                         Initializes all components on page load
+
+  js/store.js          → Data Store (State Management)
+                         Uses localStorage to persist data
+                         CRUD operations for: Users, Rumors, Evidence,
+                           Verifications, Activities, Leaderboard
+                         Real-time sync across browser tabs (BroadcastChannel)
+                         Event listener system (pub/sub pattern)
+                         Fetches rumors from API on initialization
+
+  js/models.js         → Data Model Definitions
+                         createUser()         → new anonymous user object
+                         createRumor()        → new rumor with trust scores
+                         createEvidence()     → evidence attachment
+                         createVerification() → vote record
+                         createActivityEntry()→ activity log entry
+                         Constants: EVIDENCE_WEIGHTS, CATEGORIES, ACHIEVEMENTS
+
+  js/trustEngine.js    → Trust Score Calculator (THE BRAIN)
+                         5-component weighted trust formula:
+                           V = Veracity (35%)     - Is it true?
+                           C = Confidence (25%)   - How sure are we?
+                           T = Temporal (20%)      - How recent?
+                           S = Source (10%)        - Who submitted?
+                           N = Network (10%)       - Voter agreement
+                         Calculates boosts (evidence), penalties (bot patterns)
+                         Determines status: verified/disputed/unverified
+
+  js/tokenEconomy.js   → Token/Reward System
+                         submitRumor()     - Deducts stake, creates rumor
+                         verify()          - Deducts stake, records vote
+                         checkResolution() - Should rumor be resolved?
+                         resolveRumor()    - Distribute rewards/penalties
+                         calculateVoteWeight() - Reputation-based weighting
+                         recordUserAction()    - For bot detection
+
+  js/anomalyDetector.js → Bot Detection System
+                          analyzeRumor()        - Check rumor votes for anomalies
+                          analyzeUserBehavior() - Analyze user for bot patterns
+                          detectTemporalClustering() - Votes too close together?
+                          detectUnnaturalPatterns()  - Regular intervals (bot)?
+                          detectVelocitySpike()      - Sudden vote surge?
+                          detectOneSidedVoting()     - All same direction?
+                          getRecommendation()        - Action based on score
+
+  js/api.js            → API Client
+                         Handles communication with backend server
+                         Fetch rumors, submit rumors, verify/dispute
+                         Error handling and retry logic
+
+📁 js/components/ - UI Components:
+───────────────────────────────────
+  Feed.js              → Main Feed Page
+                         Fetches rumors from API
+                         Renders rumor cards in a list
+                         Filter tabs: Trending, Recent, Verified
+                         Category filtering
+                         Real-time updates via WebSocket
+
+  SubmitRumor.js       → Rumor Submission Wizard (4 steps)
+                         Step 1: Write content (min 10 chars)
+                         Step 2: Choose category
+                         Step 3: Add evidence (photos, videos, docs)
+                         Step 4: Review & confirm stake
+                         Bot detection check before submission
+                         File upload with 10MB limit, base64 encoding
+                         60-second timeout for large uploads
+
+  VerifyRumor.js       → Verification Modal
+                         Opens when user clicks Verify/Dispute
+                         Select vote type (support/dispute)
+                         Set stake amount (slider)
+                         Add optional evidence text
+                         Bot detection check before voting
+                         Posts to API, updates local store
+
+  RumorCard.js         → Individual Rumor Display
+                         Trust score gauge with color coding
+                         Vote counts (support vs dispute)
+                         Evidence thumbnails (images/videos)
+                         View evidence in modal
+                         Download evidence files
+                         Fetches full video data from API on demand
+
+  Dashboard.js         → User Dashboard
+                         Token balance display
+                         Reputation score
+                         Activity history
+                         Achievement badges
+                         Staked tokens summary
+
+  Leaderboard.js       → Leaderboard Page
+                         Top users by reputation
+                         Rankings by accuracy
+                         Token earnings display
+
+
+================================================================================
+
+6. BACKEND - FILE BY FILE BREAKDOWN
+================================================================================
+
+📁 server/ - Main Server Files:
+─────────────────────────────────
+  database.server.js   → Standalone Database Server (MAIN SERVER FILE)
+                         Express.js on port 3000
+                         SQLite database (campusverify.db)
+                         Serves static files (HTML/CSS/JS)
+                         API endpoints:
+                           GET  /api/rumors         → list rumors (stripped)
+                           GET  /api/rumors/:id     → single rumor (full data)
+                           POST /api/rumors          → create rumor
+                           POST /api/rumors/:id/verify → submit vote
+                         WebSocket server for real-time updates
+                         Strips video data from list responses (performance)
+
+  index.js             → Full Express Server (alternative entry)
+                         Uses modular routes and middleware
+                         Mounts all route handlers
+                         Initializes WebSocket, database
+
+  simple.js            → Simplified Server
+                         Basic Express server for testing
+                         Fewer dependencies
+
+  migrate.js           → Database Migration Runner
+                         Reads SQL files from migrations/
+                         Applies schema changes to SQLite
+
+📁 server/routes/ - API Route Handlers:
+─────────────────────────────────────────
+  rumors.js            → /api/rumors routes
+                         CRUD operations for rumors
+                         Pagination (limit/offset)
+                         Category filtering
+                         Sorting options
+
+  verifications.js     → /api/verifications routes
+                         Submit verification votes
+                         Check duplicate votes
+                         Get verifications for a rumor
+
+  users.js             → /api/users routes
+                         Get user profile
+                         Update user data
+                         User statistics
+
+  auth.js              → /api/auth routes
+                         Anonymous authentication
+                         Session management
+                         Credential verification
+
+  captcha.js           → /api/captcha routes
+                         CAPTCHA generation
+                         Bot prevention at registration
+
+  upload.js            → /api/upload routes
+                         File upload handling
+                         Multer middleware
+                         Size/type validation
+
+📁 server/middleware/ - Request Processing:
+────────────────────────────────────────────
+  botDetection.js      → Server-side bot detection
+                         Checks request patterns
+                         Rate of API calls
+                         Blocks suspicious IPs/users
+
+  rateLimiter.js       → Rate limiting
+                         Prevents API abuse
+                         Per-IP request limits
+                         Sliding window algorithm
+
+  authenticate.js      → Authentication check
+                         Validates user tokens
+                         Anonymous identity verification
+
+  errorHandler.js      → Global error handler
+                         Catches unhandled errors
+                         Returns consistent error responses
+                         Logs errors for debugging
+
+📁 server/services/ - Business Logic:
+───────────────────────────────────────
+  database.js          → SQLite database service
+                         Connection management
+                         Query helpers
+                         Table creation
+
+  botDetector.js       → Server-side bot analysis
+                         IP-based detection
+                         Request pattern analysis
+                         User behavior scoring
+
+  fingerprint.js       → Device fingerprinting
+                         Browser fingerprint hashing
+                         Prevents multi-account abuse
+                         Privacy-preserving identification
+
+  blockchain.js        → Blockchain integration
+                         Smart contract interaction
+                         Token transactions on-chain
+                         Immutable rumor ledger
+
+  zkproof.js           → Zero-Knowledge Proofs
+                         Proves identity without revealing it
+                         Anonymous credential verification
+                         Privacy-preserving verification
+
+  websocket.js         → WebSocket service
+                         Real-time event broadcasting
+                         New rumor notifications
+                         Vote count updates
+
+  captcha.js           → CAPTCHA service
+                         Challenge generation
+                         Verification logic
+
+  redis.js             → Redis caching (optional)
+                         Session storage
+                         Rate limit counters
+                         Leaderboard caching
+
+  ipfs.js              → IPFS integration
+                         Decentralized file storage
+                         Evidence permanence
+                         Content-addressed storage
+
+📁 server/migrations/ - Database Schema:
+─────────────────────────────────────────
+  001_initial_schema.sql → Creates all database tables:
+                          users, rumors, verifications,
+                          evidence, activities, anomaly_logs
+
+📁 contracts/ - Solidity Smart Contracts:
+──────────────────────────────────────────
+  TruthToken.sol       → ERC-20 token contract
+                         Campus truth verification tokens
+                         Minting, burning, staking logic
+                         Reward distribution
+
+  RumorLedger.sol      → Rumor ledger contract
+                         Immutable rumor records
+                         Verification proofs on-chain
+                         Dispute resolution logic
+
+
+================================================================================
+
+7. CORE ALGORITHMS EXPLAINED
+================================================================================
+
+7a. TRUST SCORE ENGINE (How Truth Is Calculated)
+─────────────────────────────────────────────────
+
+The trust score is a WEIGHTED SUM of 5 components:
+
+  FINAL SCORE = 0.35×V + 0.25×C + 0.20×T + 0.10×S + 0.10×N
+
+Each component ranges from 0.0 to 1.0, then the sum is scaled to 0-100.
+
+  V = VERACITY (35% weight) - "Is the information true?"
+  ──────────────────────────
+    • Based on evidence quality and voter behavior
+    • Photo evidence: weight 0.5
+    • Video evidence: weight 0.5
+    • Documentary evidence: weight 0.6
+    • Testimony: weight 0.3
+    • Diminishing returns for same evidence types
+    • Dispute votes add contradiction penalty
+
+  C = CONFIDENCE (25% weight) - "How sure are we?"
+  ────────────────────────────
+    • Base: 0.5 (testimony), 0.7 (media), 0.9 (documents)
+    • Sample size: more voters = more confidence
+    • Time factor: recent votes = more reliable
+    • Diversity factor: votes spread over time = more trustworthy
+    • Clustered votes (within 2 min) = LOW confidence (suspicious)
+
+  T = TEMPORAL RELEVANCE (20% weight) - "Is it still relevant?"
+  ──────────────────────────────────────
+    • Events/Food: Fast decay (expires quickly)
+    • Academic/Facilities: Slow decay (stays relevant)
+    • Tech/Other: Medium decay
+    • Uses exponential decay function
+
+  S = SOURCE RELIABILITY (10% weight) - "Is the submitter trustworthy?"
+  ──────────────────────────────────────
+    • Based on submitter's track record
+    • Formula: (accurate - 2×false) / total_submissions
+    • New users: neutral 0.5
+    • False claims penalized 2x more than accurate claims rewarded
+
+  N = NETWORK CONSENSUS (10% weight) - "Do voters agree?"
+  ─────────────────────────────────────
+    • Weighted by voter reputation
+    • 100% support = 1.0, 100% dispute = 0.0
+    • Suspicious patterns reduce consensus score
+    • Bot-detected votes get penalty
+
+  BOOSTS:
+    +10 points for documentary evidence
+    +10 points for expert verifier consensus
+
+  PENALTIES:
+    -20 points if bot patterns detected
+    -15 points if strong contradiction (many disputes)
+
+  STATUS:
+    Score >= 70 → "VERIFIED" (green)
+    Score <= 30 → "DISPUTED" (red)
+    31-69       → "UNVERIFIED" (yellow)
+
+
+7b. TOKEN ECONOMY (Game Theory)
+────────────────────────────────
+
+  STARTING BALANCE: 100💎 tokens
+  MAX BALANCE: 500💎 tokens
+
+  SUBMITTING A RUMOR:
+    • Costs 5-50💎 tokens (your choice)
+    • Higher stake = more confidence in your claim
+    • Tokens are LOCKED until rumor resolves
+
+  VERIFYING A RUMOR:
+    • Costs 2-20💎 tokens
+    • Your vote weight = 0.5 + (reputation × 1.5)
+    • New users have 60% reduced weight
+    • Inactive users have reduced weight
+
+  RESOLUTION:
+    Triggered when: 5+ votes AND (24 hours passed OR strong consensus)
+    
+    IF VERIFIED (score >= 70%):
+      • Correct voters get: stake back + 50% bonus + share of loser pool
+      • Wrong voters lose: entire staked amount
+      • Submitter gets: stake back + 50% bonus + reputation increase
+    
+    IF REFUTED (score <= 30%):
+      • Correct voters (dispute) get: stake + bonus + loser pool share
+      • Wrong voters (support) lose: staked tokens
+      • Submitter loses: staked tokens + reputation decrease
+    
+    IF INCONCLUSIVE (31-69%):
+      • Everyone gets: 50% refund on stake
+
+  WHY IT WORKS:
+    • Lying is expensive (lose tokens)
+    • Truth-telling is profitable (win tokens + bonus)
+    • Game theory: rational actors will vote truthfully
+    • Bots can't accumulate influence (detected + blocked)
+
+
+7c. BOT / ANOMALY DETECTION
+─────────────────────────────
+
+The system detects bots at TWO levels:
+
+  LEVEL 1: USER BEHAVIOR ANALYSIS (analyzeUserBehavior)
+  ─────────────────────────────────────────────────────
+  Checks the user's action history for bot-like patterns:
+
+    FLAG: regular_timing (+0.3 score)
+      → Actions at perfectly regular intervals
+      → Coefficient of variation < 0.1 = suspicious
+      → Humans naturally have irregular timing
+
+    FLAG: 24_7_activity (+0.2 score)
+      → Active across 20+ different hours of the day
+      → Humans sleep! Bots don't.
+      → Uses hour distribution analysis
+
+    FLAG: single_action_type (+0.2 score)
+      → Only performing one type of action (e.g., only voting)
+      → After 10+ actions, if no diversity = suspicious
+      → Humans browse, submit, vote, etc.
+
+    MAX POSSIBLE BOT SCORE: 0.7 (triggers all 3 flags)
+
+  LEVEL 2: RUMOR VOTE ANALYSIS (analyzeRumor)
+  ────────────────────────────────────────────
+  Checks voting patterns on individual rumors:
+
+    FLAG: temporal_clustering (+0.3 score)
+      → 5+ votes within a 2-minute window
+      → Suggests coordinated attack
+
+    FLAG: unnatural_pattern (+0.4 score)
+      → Votes at perfectly regular intervals (1s, 5s, 10s apart)
+      → Humans vote at random intervals
+
+    FLAG: velocity_spike (+0.25 score)
+      → Voting rate 5x higher than average for all rumors
+      → Suggests botnet attack
+
+    FLAG: one_sided_voting (+0.15 score)
+      → 100% of votes in same direction
+      → 5+ votes all support or all dispute = suspicious
+
+  AUTOMATED RESPONSE:
+  ────────────────────
+    Score 0.0 - 0.3 → MINOR:    No action taken
+    Score 0.3 - 0.5 → MODERATE: Enhanced monitoring, activity logged
+    Score 0.5 - 0.7 → SEVERE:   Vote weight REDUCED by 50%, warning shown
+    Score 0.7 - 1.0 → CRITICAL: Vote BLOCKED entirely, modal shows error
+
+  WHERE ENFORCEMENT HAPPENS:
+    • VerifyRumor.js → submit() checks bot score before allowing vote
+    • SubmitRumor.js → submit() checks bot score before allowing post
+    • TrustEngine.js → calculatePenalties() reduces trust for bot-voted rumors
+
+
+================================================================================
+
+8. DATA MODELS
+================================================================================
+
+USER:
+  {
+    id:                 "id_abc123"           // Unique anonymous ID
+    username:           "Anonymous_Eagle"     // Random anonymous name
+    credentialHash:     "id_xyz789"           // Zero-knowledge credential
+    tokenBalance:       100                   // Available tokens
+    stakedTokens:       0                     // Tokens locked in bets
+    totalSubmissions:   0                     // Rumors submitted
+    verifiedAccurate:   0                     // Correct verifications
+    verifiedFalse:      0                     // Wrong verifications
+    reputationScore:    0.5                   // 0.0 to 1.0
+    actionTimestamps:   []                    // For bot detection
+    botScore:           0                     // Current bot score
+    status:             "active"              // active/flagged/suspended
+    unlockedAchievements: []                  // Achievement list
+  }
+
+RUMOR:
+  {
+    id:                 "id_abc123"
+    submitterId:        "id_user1"
+    content:            "The library wifi is down"
+    category:           "facilities"
+    veracityScore:      0.5                   // V component
+    confidenceScore:    0.3                   // C component
+    temporalRelevance:  1.0                   // T component
+    sourceReliability:  0.5                   // S component
+    networkConsensus:   0.5                   // N component
+    finalTrustScore:    50                    // 0-100 final score
+    supportCount:       3                     // Verify votes
+    disputeCount:       1                     // Dispute votes
+    evidenceIds:        ["id_ev1"]            // Attached evidence
+    stakeAmount:        10                    // Tokens staked
+    status:             "active"              // active/verified/refuted/disputed
+    evidenceFiles:      [...]                 // File attachments (photos/videos)
+  }
+
+VERIFICATION:
+  {
+    id:                 "id_ver1"
+    rumorId:            "id_abc123"
+    verifierId:         "id_user2"
+    voteType:           "support"             // support or dispute
+    stakeAmount:        5
+    voteWeight:         1.0                   // Reputation-adjusted
+    nullifierHash:      "id_hash"             // Prevents double voting
+    wasCorrect:         null                  // Set on resolution
+  }
+
+EVIDENCE:
+  {
+    id:                 "id_ev1"
+    rumorId:            "id_abc123"
+    submitterId:        "id_user1"
+    type:               "photo"               // photo/video/documentary/testimony
+    description:        "Screenshot of..."
+    weight:             0.5                   // Type-based weight
+    qualityScore:       0.8
+    contentHash:        "id_hash"             // Immutability check
+  }
+
+
+================================================================================
+
+9. SMART CONTRACTS (Blockchain Layer)
+================================================================================
+
+The project includes Solidity smart contracts for future blockchain integration:
+
+  TruthToken.sol (ERC-20):
+    • Mintable/burnable truth verification tokens
+    • Staking mechanism for rumor submission
+    • Automated reward distribution
+    • Role-based access control
+
+  RumorLedger.sol:
+    • Immutable record of all rumors
+    • On-chain verification proofs
+    • Dispute resolution via smart contract
+    • Transparent audit trail
+
+  Hardhat Configuration:
+    • hardhat.config.js set up for local development
+    • Contract deployment scripts in scripts/
+    • Test framework in test/
+
+Currently runs WITHOUT blockchain (SQLite only). Smart contracts are
+ready for deployment when scaling to a production blockchain network.
+
+
+================================================================================
+
+10. SECURITY FEATURES
+================================================================================
+
+  1. ANONYMOUS IDENTITY
+     • No personal data collected
+     • Cryptographic fingerprinting instead of names
+     • Zero-knowledge proof infrastructure ready
+
+  2. BOT DETECTION (3 layers)
+     Layer 1: Client-side behavioral analysis (anomalyDetector.js)
+     Layer 2: Server-side pattern detection (middleware/botDetection.js)
+     Layer 3: Rate limiting (middleware/rateLimiter.js)
+
+  3. ANTI-MANIPULATION
+     • Token staking prevents spam (costs money to post/vote)
+     • Reputation-weighted voting (new accounts have less influence)
+     • Suspicious pattern penalties on trust scores
+     • Double-vote prevention via nullifier hashes
+
+  4. DATA INTEGRITY
+     • Content hashes for immutability checking
+     • IPFS integration ready for decentralized storage
+     • Blockchain audit trail (smart contracts)
+
+  5. RATE LIMITING
+     • Per-IP request limits  
+     • Per-user action throttling
+     • CAPTCHA for suspicious activity
+
+
+================================================================================
+
+11. HOW EVERYTHING CONNECTS TOGETHER
+================================================================================
+
+  USER OPENS APP
+       │
+       ▼
+  index.html loads → app.js initializes
+       │
+       ▼
+  Store.init() → Creates user, fetches rumors from API
+       │
+       ▼
+  Feed.render() → Shows rumor cards from Store data
+       │
+       ├──── User clicks SUBMIT tab
+       │     SubmitRumor wizard → validates → calls API
+       │     POST /api/rumors → saves to SQLite → broadcasts via WebSocket
+       │     TokenEconomy.submitRumor() → deducts tokens
+       │     AnomalyDetector checks → blocks if bot score >= 0.7
+       │
+       ├──── User clicks VERIFY on a rumor
+       │     VerifyRumor modal opens → user selects vote + stake
+       │     AnomalyDetector.analyzeUserBehavior() → bot check
+       │     POST /api/rumors/:id/verify → saves to SQLite
+       │     TokenEconomy.verify() → deducts stake, records vote
+       │     TrustEngine.calculateTrustScore() → recalculates 5 components
+       │     Store.updateRumor() → updates local display
+       │     WebSocket broadcasts update to all connected clients
+       │
+       ├──── System checks RESOLUTION
+       │     TokenEconomy.checkResolution() → enough votes + time?
+       │     If yes → resolveRumor() → distribute rewards/penalties
+       │     Winners get: stake + 50% bonus + loser pool share
+       │     Losers get: nothing (stake forfeited)
+       │
+       └──── User views DASHBOARD
+             Dashboard.render() → shows tokens, reputation, activity
+
+
+================================================================================
+
+12. COMPLETE USER JOURNEY (Step by Step)
+================================================================================
+
+  1. Student hears: "Final exam for CS101 is postponed"
+  
+  2. Opens CampusVerify → anonymous account created (100💎 tokens)
+  
+  3. Submits rumor:
+     Content: "CS101 final exam postponed to next Friday"
+     Category: Academic
+     Evidence: Screenshot of email from professor
+     Stake: 20💎 tokens
+     → Balance: 80💎 (20 locked as stake)
+  
+  4. Rumor appears in feed:
+     Trust Score: 50% (initial, neutral)
+     Status: UNVERIFIED (yellow)
+  
+  5. Other students see it, start voting:
+     Student A: ✅ Verify (stakes 10💎, has seen the email too)
+     Student B: ✅ Verify (stakes 5💎, heard from classmate)
+     Student C: ❌ Dispute (stakes 5💎, thinks it's fake)
+     Student D: ✅ Verify (stakes 15💎, has documentary evidence)
+     Student E: ✅ Verify (stakes 10💎)
+  
+  6. Trust score updates in real-time:
+     V = 0.7 (strong evidence)
+     C = 0.65 (5 voters, good confidence)
+     T = 0.95 (very recent)
+     S = 0.5 (new submitter)
+     N = 0.8 (4:1 in favor)
+     Final = 0.35×0.7 + 0.25×0.65 + 0.20×0.95 + 0.10×0.5 + 0.10×0.8
+           = 0.245 + 0.163 + 0.19 + 0.05 + 0.08 = 0.728 × 100 = 73%
+     Status: VERIFIED ✅ (green)
+  
+  7. After 24 hours, rumor RESOLVES:
+     Score: 73% → VERIFIED
+     
+     WINNERS (original poster + 4 supporters):
+       Each gets: stake returned + 50% bonus + share of Student C's 5💎
+       Original poster: 20💎 back + 10💎 bonus + reputation boost
+     
+     LOSERS (Student C):
+       Loses: 5💎 staked tokens
+       Reputation decreases
+  
+  8. Meanwhile, a BOT tries to manipulate:
+     Bot creates 15 accounts, votes dispute rapidly
+     → AnomalyDetector detects:
+       • temporal_clustering (all within 30 seconds)
+       • unnatural_pattern (100ms intervals)
+       • one_sided_voting (all dispute)
+     → Score: 0.85 (CRITICAL)
+     → All bot votes: BLOCKED ❌
+     → Trust score: not affected
+     → System shows: "🚫 Suspicious activity detected"
+
+
+================================================================================
+                    END OF PROJECT EXPLANATION
+================================================================================
