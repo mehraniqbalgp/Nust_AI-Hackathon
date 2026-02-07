@@ -1,71 +1,86 @@
 # 🔍 CampusVerify
 
-**Anonymous Campus Rumor Verification System with Blockchain & Zero-Knowledge Proofs**
+**Anonymous Campus Rumor Verification System — NUST AI Hackathon 2026**
 
-A decentralized platform for verifying campus rumors using game-theoretic incentives, token staking, and privacy-preserving credentials.
+A real-time platform where students can anonymously submit, verify, and dispute campus rumors using game-theoretic incentives, AI-powered bot detection, and a multi-component trust scoring engine.
 
----
-
-## ✨ Features
-
-- **🎯 Trust Score Algorithm** - 5-component weighted scoring (Veracity, Confidence, Temporal, Source, Consensus)
-- **💰 Token Economy** - Stake tokens on submissions and verifications, earn rewards for accuracy
-- **🔐 Zero-Knowledge Proofs** - Anonymous voting without revealing identity
-- **⛓️ Blockchain Anchoring** - Immutable checkpoints on Polygon
-- **📁 IPFS Storage** - Decentralized evidence storage
-- **🤖 Sybil Resistance** - Proof-of-Work challenge + behavioral analysis
-- **🌙 Dark/Light Theme** - Clean glassmorphism UI
+🌐 **Live Demo:** [https://nust.retrax.co](https://nust.retrax.co)
 
 ---
 
-## 🚀 Quick Start
+## 🏆 Hackathon
 
-### 1. Clone and Install
+Built for the **NUST AI Hackathon 2026** — solving the problem of misinformation on university campuses with a decentralized, gamified approach to truth verification.
+
+---
+
+## ✨ Key Features
+
+### 🎯 Trust Score Engine
+5-component weighted scoring system:
+- **Veracity** — ratio of support vs dispute votes
+- **Confidence** — total participation level
+- **Temporal Relevance** — freshness of the rumor
+- **Source Reliability** — submitter's historical accuracy
+- **Network Consensus** — agreement strength among verifiers
+
+### 💰 Token Economy
+- Every user starts with **100 tokens**
+- Submit a rumor → stake tokens based on confidence level
+- Verify/dispute → stake tokens on your vote
+- Accurate verifications earn rewards; inaccurate ones lose stake
+- Creates real skin-in-the-game incentive for honest participation
+
+### 🤖 AI Bot Detection
+Multi-layered anomaly detection system:
+- **Temporal clustering** — catches rapid-fire bot voting
+- **Velocity spike detection** — flags unnatural activity bursts
+- **One-sided voting analysis** — detects coordinated manipulation
+- **Behavioral fingerprinting** — tracks action diversity and timing regularity
+- Severity levels: Monitor → Warn → Reduce Vote Weight → Block
+
+### 📊 Live Leaderboard
+- Real-time user rankings synced across all connected clients
+- Shows token balances, verification accuracy, and engagement
+- Server-side SQLite database for shared state
+
+### 🔐 Privacy & Security
+- Anonymous user identities (no login required)
+- Proof-of-Work challenge on app load to prevent scripted access
+- Evidence file support (photos, videos, documents)
+- Zero-Knowledge Proof circuits for anonymous voting (Circom)
+
+### ⛓️ Smart Contracts
+- `TruthToken.sol` — ERC-20 token with staking mechanics
+- `RumorLedger.sol` — On-chain rumor checkpoints and nullifiers
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- npm
+
+### Run Locally
 
 ```bash
-git clone <repo>
-cd campus-verify
+git clone https://github.com/mehraniqbalgp/Nust_AI-Hackathon.git
+cd Nust_AI-Hackathon
 npm install
+node server/database.server.js
 ```
 
-### 2. Setup Environment
+The app will be running at **http://localhost:3000**
+
+### Deploy with Cloudflare Tunnel
 
 ```bash
-cp .env.example .env
-# Edit .env with your configuration
+# Install cloudflared
+# See deployment_guide.md for full setup
+
+cloudflared tunnel run nust-campusverify
 ```
-
-### 3. Start Database (Docker)
-
-```bash
-npm run docker:up        # Start PostgreSQL + Redis
-npm run db:migrate       # Run migrations
-```
-
-### 4. Run Development Server
-
-```bash
-npm run dev              # Backend on :3000
-npm run dev:frontend     # Frontend on :8080 (optional)
-```
-
----
-
-## 📦 Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start backend with hot reload |
-| `npm run dev:frontend` | Serve frontend on port 8080 |
-| `npm run docker:up` | Start PostgreSQL + Redis containers |
-| `npm run db:migrate` | Run database migrations |
-| `npm run db:reset` | Reset and re-run all migrations |
-| `npm run contracts:compile` | Compile Solidity contracts |
-| `npm run contracts:test` | Run contract unit tests |
-| `npm run contracts:deploy:mumbai` | Deploy to Polygon Mumbai |
-| `npm run zk:compile` | Compile ZK circuits |
-| `npm run test` | Run API integration tests |
-| `npm run test:e2e` | Run Playwright browser tests |
 
 ---
 
@@ -78,95 +93,18 @@ npm run dev:frontend     # Frontend on :8080 (optional)
 │   │  Feed   │ │ Submit  │ │Dashboard│ │   Leaderboard   │   │
 │   └────┬────┘ └────┬────┘ └────┬────┘ └────────┬────────┘   │
 │        └───────────┴───────────┴───────────────┘            │
-│                          │ API Client                        │
+│             Store (LocalStorage + Server Sync)               │
 └──────────────────────────┼──────────────────────────────────┘
-                           │ REST + WebSocket
+                           │ REST API + WebSocket
 ┌──────────────────────────┼──────────────────────────────────┐
-│                       Backend                                │
-│   ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────────────┐   │
-│   │  Auth   │ │ Rumors  │ │ Verify  │ │     Upload      │   │
-│   └────┬────┘ └────┬────┘ └────┬────┘ └────────┬────────┘   │
-│        └───────────┴───────────┴───────────────┘            │
-│                          │                                   │
-│   ┌──────────────────────┴──────────────────────────────┐   │
-│   │ PostgreSQL │    Redis    │   IPFS   │  Blockchain   │   │
-│   └─────────────────────────────────────────────────────┘   │
+│                    Express Backend                            │
+│   ┌─────────────────┬──────────────┬──────────────────────┐   │
+│   │  Rumors API     │  Users API   │  Leaderboard API     │   │
+│   └────────┬────────┴──────┬───────┴──────────┬───────────┘   │
+│            └───────────────┴──────────────────┘              │
+│                     SQLite Database                           │
+│              (rumors, verifications, users)                   │
 └─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🧪 Testing
-
-```bash
-# API Integration Tests
-npm run test
-
-# Smart Contract Tests
-npm run test:contracts
-
-# E2E Browser Tests
-npm run test:e2e
-
-# Run All Tests
-npm run test:all
-```
-
----
-
-## 🔗 Smart Contracts
-
-| Contract | Description | Network |
-|----------|-------------|---------|
-| `TruthToken` | ERC-20 with staking/rewards | Polygon Mumbai |
-| `RumorLedger` | Checkpoints + nullifiers | Polygon Mumbai |
-
-### Deploy Contracts
-
-```bash
-# Start local node
-npm run contracts:node
-
-# Deploy locally
-npm run contracts:deploy:local
-
-# Deploy to Mumbai testnet
-npm run contracts:deploy:mumbai
-```
-
----
-
-## 🔐 Zero-Knowledge Proofs
-
-The `anonymous_vote.circom` circuit enables:
-- Merkle tree membership proof
-- Nullifier-based double-vote prevention
-- Identity never revealed on-chain
-
-### Compile Circuits
-
-```bash
-npm run zk:compile
-```
-
-Requires: `circom` and `snarkjs` installed globally.
-
----
-
-## 🐳 Docker
-
-```bash
-# Start dependencies only
-docker compose up -d postgres redis
-
-# Start everything (including app)
-docker compose --profile full up -d
-
-# View logs
-docker compose logs -f
-
-# Stop all
-docker compose down
 ```
 
 ---
@@ -174,36 +112,52 @@ docker compose down
 ## 📁 Project Structure
 
 ```
-├── contracts/           # Solidity smart contracts
-├── circuits/            # Circom ZK circuits
-├── server/              # Express backend
-│   ├── routes/          # API routes
-│   ├── services/        # Business logic
-│   ├── middleware/      # Express middleware
-│   └── migrations/      # SQL migrations
-├── js/                  # Frontend JavaScript
-│   └── components/      # UI components
-├── test/                # Tests
-│   ├── api.test.js      # API integration tests
-│   ├── contracts/       # Contract unit tests
-│   └── e2e/             # Browser E2E tests
-├── scripts/             # Deployment scripts
-├── index.html           # Frontend entry
-└── index.css            # Styles
+├── index.html               # Main SPA entry point
+├── index.css                # Full styling (dark/light themes, glassmorphism)
+├── js/
+│   ├── app.js               # App controller & navigation
+│   ├── store.js             # State management (localStorage + server sync)
+│   ├── models.js            # Data models (User, Rumor, Evidence, etc.)
+│   ├── trustEngine.js       # 5-component trust score algorithm
+│   ├── tokenEconomy.js      # Token staking & reward system
+│   ├── anomalyDetector.js   # Bot detection & behavioral analysis
+│   ├── api.js               # API client
+│   └── components/
+│       ├── Feed.js           # Rumor feed with filtering
+│       ├── SubmitRumor.js    # Multi-step rumor submission
+│       ├── VerifyRumor.js    # Verification modal with bot checks
+│       ├── RumorCard.js      # Individual rumor display
+│       ├── Dashboard.js      # User stats & achievements
+│       └── Leaderboard.js    # Live rankings
+├── server/
+│   ├── database.server.js   # Express + SQLite + WebSocket server
+│   ├── middleware/           # Auth, rate limiting, bot detection
+│   ├── routes/               # API route handlers
+│   └── services/             # Business logic services
+├── contracts/
+│   ├── TruthToken.sol        # ERC-20 token contract
+│   └── RumorLedger.sol       # Rumor checkpoint contract
+├── circuits/
+│   └── anonymous_vote.circom # ZK circuit for anonymous voting
+└── test/                     # API, contract, and E2E tests
 ```
 
 ---
 
-## 📄 License
+## 🛠️ Tech Stack
 
-MIT
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Vanilla JS, CSS (Glassmorphism), Single Page App |
+| Backend | Node.js, Express.js |
+| Database | SQLite (better-sqlite3) |
+| Real-time | WebSocket (ws) |
+| Deployment | Cloudflare Tunnel |
+| Smart Contracts | Solidity, Hardhat |
+| ZK Proofs | Circom, snarkjs |
 
 ---
 
-## 🤝 Contributing
+## 👥 Team
 
-1. Fork the repo
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open Pull Request
+Built by **Mehran Iqbal** and team at the NUST AI Hackathon 2026.
